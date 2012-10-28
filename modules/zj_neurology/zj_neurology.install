@@ -37,6 +37,7 @@ function zj_neurology_install() {
     'label' => $vocabulary->name,
     'bundle' => 'article',
     'description' => $vocabulary->help,
+    'required' => true,
     'widget' => array(
       'type' => 'options_buttons',
       'weight' => -5,
