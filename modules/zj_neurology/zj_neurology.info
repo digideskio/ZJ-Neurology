@@ -1,0 +1,5 @@
+name = 浙江省神经病学分会
+description = 浙江省神经病学分会网站
+core = 7.x
+version = 7.x-1.0-dev
+package = zj_neurology

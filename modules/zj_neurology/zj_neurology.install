@@ -1,0 +1,78 @@
+<?php
+
+/**
+ * Implements hook_install().
+ */
+function zj_neurology_install() {
+  // 创建网站栏目（Sections）
+  // @see http://steindom.com/articles/creating-vocabularies-and-taxonomy-terms-programmatically-drupal-7
+  taxonomy_vocabulary_save((object) array('name' => '网站栏目', 'machine_name' => 'sections'));
+  $vocabulary = taxonomy_vocabulary_machine_name_load('sections');
+  taxonomy_term_save((object) array('name' => '001', 'vid' => $vocabulary->vid));
+  taxonomy_term_save((object) array('name' => '002', 'vid' => $vocabulary->vid));
+  taxonomy_term_save((object) array('name' => '003', 'vid' => $vocabulary->vid));
+
+  // 内容类型Article添加“网站栏目”字段
+  // @see profiles/standard/standard.install
+  // @see http://ado.io/blog/drupal-7/working-programmatically-with-fields-in-drupal-7
+  $field = array(
+    'field_name' => 'field_' . $vocabulary->machine_name,
+    'type' => 'taxonomy_term_reference',
+    // Set cardinality to unlimited for tagging.
+    'cardinality' => FIELD_CARDINALITY_UNLIMITED,
+    'settings' => array(
+      'allowed_values' => array(
+        array(
+          'vocabulary' => $vocabulary->machine_name,
+          'parent' => 0,
+        ),
+      ),
+    ),
+  );
+  field_create_field($field);
+
+  $instance = array(
+    'field_name' => 'field_' . $vocabulary->machine_name,
+    'entity_type' => 'node',
+    'label' => $vocabulary->name,
+    'bundle' => 'article',
+    'description' => $vocabulary->help,
+    'widget' => array(
+      'type' => 'options_buttons',
+      'weight' => -5,
+    ),
+    'display' => array(
+      'default' => array(
+        'type' => 'taxonomy_term_reference_link',
+        'weight' => 10,
+      ),
+      'teaser' => array(
+        'type' => 'taxonomy_term_reference_link',
+        'weight' => 10,
+      ),
+    ),
+  );
+  field_create_instance($instance);
+}
+
+/**
+ * Implements hook_uninstall().
+ */
+function zj_neurology_uninstall() {
+  $vocabulary = taxonomy_vocabulary_machine_name_load('sections');
+
+  // 内容类型Article移除“网站栏目”字段
+  $instance = field_info_instance('node', 'field_' . $vocabulary->machine_name, 'article');
+  field_delete_instance($instance);
+
+  // 删除网站栏目
+  $tids = db_select('taxonomy_term_data', 't')
+    ->fields('t', array('tid'))
+    ->condition('vid', $vocabulary->vid)
+    ->execute()
+    ->fetchCol();
+  foreach ($tids as $tid) {
+    taxonomy_term_delete($tid);
+  }
+  taxonomy_vocabulary_delete($vocabulary->vid);
+}
