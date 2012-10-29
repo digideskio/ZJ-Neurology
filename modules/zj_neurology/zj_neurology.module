@@ -1,0 +1,68 @@
+<?php
+
+/**
+ * Implements hook_permission().
+ */
+function zj_neurology_permission() {
+  return array(
+    'admini zj_neurology' => array(
+      'title' => 'Config ZJ Neurology',
+    ),
+  );
+}
+
+/**
+ * Implements hook_menu().
+ */
+function zj_neurology_menu() {
+  $items = array();
+
+  $items['admin/config/zj_neurology'] = array(
+    'title' => '配置ZJ Neurology',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('zj_neurology_config'),
+    'access arguments' => array('admin zj_neurology'),
+    'file' => 'zj_neurology.admin.inc',
+  );
+
+  return $items;
+}
+
+/**
+ * Implements hook_theme().
+ */
+function zj_neurology_theme() {
+  return array(
+    'zj_list' => array(
+      'template' => 'zj-list',
+      'variables' => array('nodes' => array()),
+    ),
+    'zj_list_gallery' => array(
+      'template' => 'zj-list-gallery',
+      'variables' => array('nodes' => array()),
+    ),
+  );
+}
+
+function zj_neurology_page_alter(&$page) {
+  if(arg(0) == "taxonomy" && arg(1) == "term"){
+    $term = $page['content']['system_main']['term_heading']['term']['#term'];
+    if (zj_neurology_variable_get('term_suggestions_' . $term->tid, 'default') !== 'default') {
+      $nodes = array();
+      foreach ($page['content']['system_main']['nodes'] as $nid => $node) {
+        if (is_int($nid)) $nodes[$nid] = $node['body']['#object'];
+      }
+      $page['content']['system_main']['nodes'] = array('#markup' => theme('zj_list_gallery', array('nodes' => $nodes)));
+    }
+  }
+}
+
+function zj_neurology_variable_get($name, $default = NULL) {
+  $name = 'zj_neurology_' . $name;
+  return variable_get($name, $default);
+}
+
+function zj_neurology_variable_set($name, $value) {
+  $name = 'zj_neurology_' . $name;
+  variable_set($name, $value);
+}
