@@ -17,6 +17,13 @@ function zj_neurology_permission() {
 function zj_neurology_menu() {
   $items = array();
 
+  $items['home'] = array(
+    'title' => '首页',
+    'page callback' => 'zj_neurology_page_home',
+    'access arguments' => array('access content'),
+    'file' => 'zj_neurology.pages.inc',
+  );
+
   $items['admin/config/zj_neurology'] = array(
     'title' => '配置ZJ Neurology',
     'page callback' => 'drupal_get_form',
@@ -41,20 +48,67 @@ function zj_neurology_theme() {
       'template' => 'zj-list-gallery',
       'variables' => array('nodes' => array()),
     ),
+    'zj_news_block' => array(
+      'template' => 'zj-news-block',
+      'variables' => array('nodes' => array()),
+    ),
   );
 }
 
+/**
+ * TODO Taxonomy后台管理页面也受该函数的影响，如何移除呢？
+ */
 function zj_neurology_page_alter(&$page) {
-  if(arg(0) == "taxonomy" && arg(1) == "term"){
+  if(arg(0) == "taxonomy" && arg(1) == "term" && isset($page['content']['system_main']['term_heading'])){
     $term = $page['content']['system_main']['term_heading']['term']['#term'];
     if (zj_neurology_variable_get('term_template_' . $term->tid, 'default') !== 'default') {
       $nodes = array();
-      foreach ($page['content']['system_main']['nodes'] as $nid => $node) {
-        if (is_int($nid)) $nodes[$nid] = $node['body']['#object'];
+      if(isset($page['content']['system_main']['nodes']) && $page['content']['system_main']['nodes']) {
+        foreach ($page['content']['system_main']['nodes'] as $nid => $node) {
+          if (is_int($nid)) $nodes[$nid] = $node['body']['#object'];
+        }
+        $page['content']['system_main']['nodes'] = array('#markup' => theme('zj_' . zj_neurology_variable_get('term_template_' . $term->tid), array('nodes' => $nodes)));
       }
-      $page['content']['system_main']['nodes'] = array('#markup' => theme('zj_' . zj_neurology_variable_get('term_template_' . $term->tid), array('nodes' => $nodes)));
     }
   }
+}
+
+function zj_neurology_block_info() {
+  $blocks = array();
+
+  $vocabulary = taxonomy_vocabulary_machine_name_load('sections');
+  $terms = taxonomy_term_load_multiple(array(), array('vid' => $vocabulary->vid));
+  foreach ($terms as $term) {
+    $blocks['term_block_' . $term->tid] = array(
+      'info' => 'Term Block: ' . $term->name,
+      'cache' => DRUPAL_CACHE_GLOBAL,
+      'status' => 1,
+      'region' => 'content',
+      'visibility' => BLOCK_VISIBILITY_LISTED,
+      'pages' => '<front>',
+    );
+  }
+
+  return $blocks;
+}
+
+function zj_neurology_block_view($delta = '') {
+  $block = array();
+
+  switch ($delta) {
+    default:
+      if (strpos($delta, 'term_block_') === 0) {
+        $tid = intval(substr($delta, strlen('term_block_')));
+        $term = taxonomy_term_load($tid);
+        if ($term) {
+          $block['subject'] = $term->name;
+          $block['content'] = theme('zj_news_block', array('nodes' => node_load_multiple(taxonomy_select_nodes($tid, TRUE, 10))));
+        }
+      }
+      break;
+  }
+
+  return $block;
 }
 
 function zj_neurology_variable_get($name, $default = NULL) {

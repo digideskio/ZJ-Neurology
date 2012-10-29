@@ -6,11 +6,34 @@
 function zj_neurology_install() {
   // 创建网站栏目（Sections）
   // @see http://steindom.com/articles/creating-vocabularies-and-taxonomy-terms-programmatically-drupal-7
-  taxonomy_vocabulary_save((object) array('name' => '网站栏目', 'machine_name' => 'sections'));
-  $vocabulary = taxonomy_vocabulary_machine_name_load('sections');
-  taxonomy_term_save((object) array('name' => '学会动态', 'vid' => $vocabulary->vid));
-  taxonomy_term_save((object) array('name' => '委员风采', 'vid' => $vocabulary->vid));
-  taxonomy_term_save((object) array('name' => '科普宣传', 'vid' => $vocabulary->vid));
+  $vocabulary = (object) array('name' => '网站栏目', 'machine_name' => 'sections');
+  taxonomy_vocabulary_save($vocabulary);
+
+  $terms = array(
+    'activities' => (object) array('name' => '学会动态', 'vid' => $vocabulary->vid),
+    'progress' => (object) array('name' => '学科进展', 'vid' => $vocabulary->vid),
+    'members' => (object) array('name' => '委员风采', 'vid' => $vocabulary->vid),
+    'propagandas' => (object) array('name' => '科普宣传', 'vid' => $vocabulary->vid),
+    'subgroups' => (object) array('name' => '各地分会', 'vid' => $vocabulary->vid),
+  );
+  foreach ($terms as $term) {
+    taxonomy_term_save($term);
+  }
+
+  // 添加菜单项，自定义Path
+  foreach ($terms as $alias => $term) {
+    $link = array(
+      'link_path' => 'taxonomy/term/' . $term->tid,
+      'link_title' => $term->name,
+      'menu_name' => 'main-menu',
+    );
+    menu_link_save($link);
+    $path = array(
+      'source' => $link['link_path'],
+      'alias' => $alias,
+    );
+    path_save($path);
+  }
 
   // 内容类型Article添加“网站栏目”字段
   // @see profiles/standard/standard.install
@@ -19,7 +42,7 @@ function zj_neurology_install() {
     'field_name' => 'field_' . $vocabulary->machine_name,
     'type' => 'taxonomy_term_reference',
     // Set cardinality to unlimited for tagging.
-    'cardinality' => FIELD_CARDINALITY_UNLIMITED,
+    'cardinality' => 1,
     'settings' => array(
       'allowed_values' => array(
         array(
@@ -39,7 +62,7 @@ function zj_neurology_install() {
     'description' => $vocabulary->help,
     'required' => true,
     'widget' => array(
-      'type' => 'options_buttons',
+      'type' => 'options_select',
       'weight' => -5,
     ),
     'display' => array(
@@ -54,6 +77,14 @@ function zj_neurology_install() {
     ),
   );
   field_create_instance($instance);
+}
+
+function zj_neurology_enable() {
+  variable_set('default_nodes_main', 20);
+}
+
+function zj_neurology_disable() {
+  variable_set('default_nodes_main', 10);
 }
 
 /**

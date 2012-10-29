@@ -1,0 +1,42 @@
+
+.front #page-title {display: none;}
+.sidebar-second #content {margin-left: 0px;}
+
+
+/* =====================
+   News Block
+   ===================== */
+
+.news-block {}
+.news-block ul {float: left; width: 300px;}
+.news-block ul.left {padding-left: 0px; padding-right: 5px; border-right: 1px dotted #cccccc;}
+.news-block ul.right {padding-left: 5px;}
+.news-block ul li {clear: both; margin-bottom: 3px; height: 20px; list-style: none;}
+.news-block .content .title {float: left;}
+.news-block .content .pub-date {float: right; color: #666666;}
+.news-block ul li.top {height: 66px; margin-bottom: 3px;}
+.news-block .top .image {float: left; width: 64px; height: 64px; margin-right: 3px;}
+.news-block .top .content {overflow: hidden; zoom: 1; height: 66px;}
+.news-block .top .content .title {font-weight: bold;}
+.news-block .top .content .summary {clear: left; line-height: 16px;}
+
+/* =====================
+   News List
+   ===================== */
+
+.news-list {width: 100%;}
+.news-list ul li {clear: both; height: 20px; margin-bottom: 3px;}
+.news-list ul li.separator {margin-bottom: 10px;}
+.news-list .content .title {float: left;}
+.news-list .content .pub-date {float: right; color: #666666;}
+
+/* =====================
+   News List Gallery
+   ===================== */
+
+.news-list-gallery {width: 100%;}
+.news-list-gallery ul li {float: left; padding: 10px; height: 160px; list-style: none;}
+.news-list-gallery .content {width: 128px; text-align: center;}
+.news-list-gallery .content .image img {width: 128px; height: 128px;}
+
+
