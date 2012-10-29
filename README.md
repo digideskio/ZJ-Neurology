@@ -13,5 +13,9 @@ TODOs
 -----
 
 * Add Section Filter for 'admin/content'
+* 处理BreadCrumbs
+* 实现Term Blocks的更灵活的配置选项
+* 整合Block More Link模块
+* Article Node页面菜单高亮映射
 
 --EOF--
