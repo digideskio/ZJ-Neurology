@@ -8,9 +8,9 @@ function zj_neurology_install() {
   // @see http://steindom.com/articles/creating-vocabularies-and-taxonomy-terms-programmatically-drupal-7
   taxonomy_vocabulary_save((object) array('name' => '网站栏目', 'machine_name' => 'sections'));
   $vocabulary = taxonomy_vocabulary_machine_name_load('sections');
-  taxonomy_term_save((object) array('name' => '001', 'vid' => $vocabulary->vid));
-  taxonomy_term_save((object) array('name' => '002', 'vid' => $vocabulary->vid));
-  taxonomy_term_save((object) array('name' => '003', 'vid' => $vocabulary->vid));
+  taxonomy_term_save((object) array('name' => '学会动态', 'vid' => $vocabulary->vid));
+  taxonomy_term_save((object) array('name' => '委员风采', 'vid' => $vocabulary->vid));
+  taxonomy_term_save((object) array('name' => '科普宣传', 'vid' => $vocabulary->vid));
 
   // 内容类型Article添加“网站栏目”字段
   // @see profiles/standard/standard.install

@@ -47,12 +47,12 @@ function zj_neurology_theme() {
 function zj_neurology_page_alter(&$page) {
   if(arg(0) == "taxonomy" && arg(1) == "term"){
     $term = $page['content']['system_main']['term_heading']['term']['#term'];
-    if (zj_neurology_variable_get('term_suggestions_' . $term->tid, 'default') !== 'default') {
+    if (zj_neurology_variable_get('term_template_' . $term->tid, 'default') !== 'default') {
       $nodes = array();
       foreach ($page['content']['system_main']['nodes'] as $nid => $node) {
         if (is_int($nid)) $nodes[$nid] = $node['body']['#object'];
       }
-      $page['content']['system_main']['nodes'] = array('#markup' => theme('zj_list_gallery', array('nodes' => $nodes)));
+      $page['content']['system_main']['nodes'] = array('#markup' => theme('zj_' . zj_neurology_variable_get('term_template_' . $term->tid), array('nodes' => $nodes)));
     }
   }
 }
