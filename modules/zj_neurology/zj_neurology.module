@@ -73,6 +73,12 @@ function zj_neurology_page_alter(&$page) {
   }
 }
 
+function zj_neurology_preprocess_page(&$variables) {
+  // 自定义RSS按钮
+  $feeds = drupal_add_feed('rss.xml', variable_get('site_name') . '－最新文章');
+  $variables['feed_icons'] = $feeds['rss.xml'];
+}
+
 function zj_neurology_block_info() {
   $blocks = array();
 
